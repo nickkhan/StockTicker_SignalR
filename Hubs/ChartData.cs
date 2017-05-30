@@ -13,7 +13,7 @@ namespace StockChartMVC_SignalR.Hubs
     {
         private readonly static Lazy<ChartData> _instance = new Lazy<ChartData>(() => new ChartData());
         private readonly ConcurrentQueue<Price> _points = new ConcurrentQueue<Price>();
-        private readonly int _updateInterval = 250; //ms        
+        private readonly int _updateInterval = 100; //ms        
         private Timer _timer;
         private readonly object _updatePointsLock = new object();
         private bool _updatingData = false;
@@ -95,7 +95,7 @@ namespace StockChartMVC_SignalR.Hubs
 
             using (WebClient web = new WebClient())
             {
-                csvData = web.DownloadString("http://finance.yahoo.com/d/quotes.csv?s=MSFT&f=snbaopl1v");
+                csvData = web.DownloadString("http://finance.yahoo.com/d/quotes.csv?s=MSFT&f=snbaopl1vc6p2xr");
             }
 
             List<Price> prices = YahooFinance.Parse(csvData);

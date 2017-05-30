@@ -62,18 +62,22 @@
                 }
             }, // drawing is faster without shadows
             yaxis: {
+
                 min: 0, max: 100,
+                tickSize:5,
                 tickFormatter: function (val, axis) {
                     return '$' + val;
                 }
             },
             xaxis: {
-                show: true
+                show: false
             }
         };
 
         var plot = $.plot($("#placeholder"), [initData()], options);
         function update(data) {
+            
+            $('#stockExchange').text(data.StockExchange);
             $('#askPrice').text('$' + data.Ask);
             $('#bidPrice').text('$' + data.Bid);
             $('#openPrice').text('$' + data.Open);
@@ -82,7 +86,10 @@
             $('#symbol').text(data.Symbol);
             $('#stockName').text( data.Name);
             $('#vol').text( data.Volume);
-
+           
+            $('#changePercent').text(data.ChangePercent);
+            $('#peRatio').text(data.PERatio);
+            
             plot.setData([getData(data)]);
             plot.draw();
         }
@@ -92,18 +99,19 @@
 <div id="body" class="container">
     <div style="text-align: center">
         <h2>
-            <span id="stockName" class="span1"></span>(<span id="symbol" class="span1"></span>)
+            <span id="stockExchange" class="span1"></span> : <span id="stockName" class="span1"></span>(<span id="symbol" class="span1"></span>) <span id="changePercent" class="span1"></span>
         </h2>
 
         <h4>
             Ask: <span id="askPrice" class="span1"></span>  Bid: <span id="bidPrice" class="span1"></span>
             Open: <span id="openPrice" class="span1"></span> Last: <span id="lastPrice" class="span1"></span>
+            P/E Ratio: <span id="peRatio" class="span1"></span>
         </h4>
         <h4>
             Volume: <span id="vol" class="span1"></span>
         </h4>
 
-        <div id="placeholder" style="width: 1000px; height: 400px; margin: 0 auto">
+        <div id="placeholder" style="width: 1200px; height: 500px; margin: 0 auto">
         </div>
     </div>
 </div>
