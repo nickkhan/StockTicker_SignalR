@@ -1,0 +1,109 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+}
+@Scripts.Render("~/bundles/jquery")
+@Scripts.Render("~/bundles/bootstrap")
+<!--[if lte IE 8]><script language="javascript" type="text/javascript" src="~/Scripts/excanvas.min.js"></script><![endif]-->
+<script src="~/Scripts/flot/jquery.flot.min.js" type="text/javascript"></script>
+
+<script src="~/Scripts/jquery.signalR-2.2.2.min.js" type="text/javascript"></script>
+<script src="~/signalr/hubs"></script>
+<script>
+    $(function () {
+
+        //Create the proxy
+        var chartData = $.connection.chartData;
+
+        function init() {
+            return chartData.server.initData();
+        }
+
+        chartData.client.updateData = function (data) {
+            update(data);
+        }
+
+        // Start the connection
+        $.connection.hub.start(
+        function () {
+            init();
+        });
+
+        var ypt = [], totalPoints = 30;
+
+        function initData() {
+            for (var i = 0; i < totalPoints; ++i)
+                ypt.push(0);
+            return getPoints();
+
+        }
+        function getData(data) {
+            if (ypt.length > 0)
+                ypt = ypt.slice(1);
+
+            ypt.push(data.Last);
+
+            return getPoints();
+        }
+        function getPoints() {
+            var ret = [];
+            for (var i = 0; i < ypt.length; ++i)
+                ret.push([i, ypt[i]]);
+            return ret;
+        }
+
+        // setup plot
+        var options = {
+            series: {
+                shadowSize: 0, lines: {
+                    show: true,                    
+                    fill: true,
+                    fillColor: "#66ccff",
+                    highlightColor: "#00008f"
+                }
+            }, // drawing is faster without shadows
+            yaxis: {
+                min: 0, max: 100,
+                tickFormatter: function (val, axis) {
+                    return '$' + val;
+                }
+            },
+            xaxis: {
+                show: true
+            }
+        };
+
+        var plot = $.plot($("#placeholder"), [initData()], options);
+        function update(data) {
+            $('#askPrice').text('$' + data.Ask);
+            $('#bidPrice').text('$' + data.Bid);
+            $('#openPrice').text('$' + data.Open);
+            $('#closePrice').text('$' + data.Close);
+            $('#lastPrice').text('$' + data.Last);
+            $('#symbol').text(data.Symbol);
+            $('#stockName').text( data.Name);
+            $('#vol').text( data.Volume);
+
+            plot.setData([getData(data)]);
+            plot.draw();
+        }
+    });
+</script>
+
+<div id="body" class="container">
+    <div style="text-align: center">
+        <h2>
+            <span id="stockName" class="span1"></span>(<span id="symbol" class="span1"></span>)
+        </h2>
+
+        <h4>
+            Ask: <span id="askPrice" class="span1"></span>  Bid: <span id="bidPrice" class="span1"></span>
+            Open: <span id="openPrice" class="span1"></span> Last: <span id="lastPrice" class="span1"></span>
+        </h4>
+        <h4>
+            Volume: <span id="vol" class="span1"></span>
+        </h4>
+
+        <div id="placeholder" style="width: 1000px; height: 400px; margin: 0 auto">
+        </div>
+    </div>
+</div>
